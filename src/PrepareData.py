@@ -16,7 +16,7 @@ class PrepareData:
     def prepare_data(self, sample_num, step, labels, train_file_path, test_file_path):
         train_file = open(train_file_path,"w+")
         test_file = open(test_file_path,"w+")
-        files = listdir()
+        files = listdir("../data")
         train_data = []
         test_data = []
         for file in files:
@@ -37,7 +37,7 @@ class PrepareData:
                 #     x.append((np.array(next_line) - np.array(this_line)).tolist())
                 #     y.append(labels[lines[i].rstrip().split(",")[-1]])
 
-                data_pd = pandas.read_csv(file)
+                data_pd = pandas.read_csv("../data/"+file)
                 data_np = data_pd[["acc1","acc2","acc3","gro1","gro2","gro3"]].values
                 data_np = data_np[1:] - data_np[:-1]
                 data_list = data_np.tolist()

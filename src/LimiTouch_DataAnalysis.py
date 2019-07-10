@@ -8,42 +8,32 @@ import numpy as np
 import sys
 
 ############ Set the parameter ############
-LABELS = {"line":0, "sphere":1}
+# LABELS = {"line":0, "sphere":1}
 # LABELS = {"dot":0, "flat": 1, "still":2, "air":3}
+LABELS = {'still':0, 'flat': 1}
 
 N_OUTPUT = len(LABELS)
 
-NUM_SAMPLE = 70
-STEP_LENGTH = 1
+NUM_SAMPLE = 50
+STEP_LENGTH = 2
 
-NUM_HIDDEN = 80
+NUM_HIDDEN = 60
 NUM_BATCH = 10000
-NUM_TRAIN = 1000
+NUM_TRAIN = 500
 
-TRAIN_FILE_PATH = "processed/train_file.csv"
-TEST_FILE_PATH = "processed/test_file.csv"
-PARAMETERS_FILE_PATH = "processed/parameters.txt"
+
+
+TRAIN_FILE_PATH = "../data/processed/train_file.csv"
+TEST_FILE_PATH = "../data/processed/test_file.csv"
+PARAMETERS_FILE_PATH = "../models/parameters.txt"
+SAVE_MODEL = "../models/model.txt"
+
 
 
 
 ########### Get the data #############
 pd = PD.PrepareData()
-
-if len(sys.argv) == 1:
-    para_file = open(PARAMETERS_FILE_PATH)
-    parameters = para_file.readlines()
-    pd.mean = np.array(list(map(float, parameters[0].rstrip()[1:-1].split(","))))
-    pd.std = np.array(list(map(float, parameters[1].rstrip()[1:-1].split(","))))
-    
-# elif sys.argv[1] == "pd":
-
 (train_data, test_data) = pd.prepare_data(NUM_SAMPLE, STEP_LENGTH, LABELS, TRAIN_FILE_PATH, TEST_FILE_PATH)
-
-############# Save the parameters ####################
-para_file = open(PARAMETERS_FILE_PATH,"w+")
-para_file.write(str(pd.mean.tolist()) + "\n")
-para_file.write(str(pd.std.tolist())+"\n")
-para_file.close()
 
 # print("Loading the data")
 # data = pd.load_data(TRAIN_FILE_PATH)
@@ -80,30 +70,17 @@ for i in range(len(LABELS)):
     total += count[i][i]
 print("| accuracy total : ", total / count.sum())
 
-time.sleep(1)
 
+#################### Save the data and the model ######################
 
-#################### real time detection ######################
-import serial
-ser = serial.Serial('/dev/cu.usbmodem14201', 115200) 
-CHECKING_NUM = 10
+torch.save(net, SAVE_MODEL)
 
-# data = []
-# while len(data) < 
-
-while True:
-    data = [[]]
-    while len(data[0]) < 6 * NUM_SAMPLE:
-        for i in range(STEP_LENGTH - 1): #Skip some of the data
-            ser.readline()
-        this_read = list(map(float, ser.readline().decode('utf-8').split(",")))[0:6]
-        next_read = list(map(float, ser.readline().decode('utf-8').split(",")))[0:6]
-        data[0] += (np.array(next_read) - np.array(this_read)).tolist()
-    
-    data[0] = (np.array(data[0]) - pd.mean) / pd.std
-    data = Variable(torch.FloatTensor(data))
-    prediction = torch.max(F.softmax(net(data)),1)[1]
-    pred_y = prediction.data.numpy().squeeze()
-    print(pred_y)
+para_file = open(PARAMETERS_FILE_PATH,"w+")
+para_file.write(str(LABELS) + "\n")
+para_file.write("NUM_SAMPLE:"+str(NUM_SAMPLE) + "\n")
+para_file.write("STEP_LENGTH:"+str(STEP_LENGTH) + "\n")
+para_file.write(str(pd.mean.tolist()) + "\n")
+para_file.write(str(pd.std.tolist())+"\n")
+para_file.close()
 
 
