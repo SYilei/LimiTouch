@@ -8,9 +8,9 @@ import numpy as np
 import sys
 
 ############ Set the parameter ############
-# LABELS = {"line":0, "sphere":1}
+LABELS = {"line":0, "sphere":1}
 # LABELS = {"dot":0, "flat": 1, "still":2, "air":3}
-LABELS = {'still':0, 'dot':1, 'flat':2, 'air': 3}
+# LABELS = {'still':0, 'dot':1, 'flat':2, 'air': 3}
 
 N_OUTPUT = len(LABELS)
 
