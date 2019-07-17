@@ -1,20 +1,38 @@
 import numpy as np
-import ahrs
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import random as rd
 from pyquaternion import Quaternion
 import madgwickahrs as mg
-import serial
 import time
 import math
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from utils import get_serial
+from double_integral import DoubleIntegrator3D
+import atexit
 
-ser = serial.Serial('/dev/cu.usbmodem14201', 115200) 
-ma = mg.MadgwickAHRS(sampleperiod= 1.0 / 213.0)
+# prints the double integrated position to the console
+def print_trajectory():
+    coord_by_axis = tuple(zip(*trajectory))
+    print("\n".join(map(repr, trajectory)))
+    print("\nRange: [{}, {}], [{}, {}], [{}, {}]".format(
+        min(coord_by_axis[0]),
+        max(coord_by_axis[0]),
+        min(coord_by_axis[1]),
+        max(coord_by_axis[1]),
+        min(coord_by_axis[2]),
+        max(coord_by_axis[2]),
+        ))
+# Uncomment the statement below to print the double integration results
+# when the program exits.
+#atexit.register(print_trajectory)
+
+ser = get_serial(None, 115200)
+sample_period = 1.0 / 200
+ma = mg.MadgwickAHRS(sampleperiod=sample_period)
 count = 0
 
 x_bias = 29.69433
@@ -120,9 +138,12 @@ p_z = 0
 # for i in range(2500):
 #     print(ser.readline())
 
+itg = DoubleIntegrator3D(spacing=sample_period)
+trajectory = tuple()
+
 while True:
     en = time.time()
-    # print(en - st)
+    print(1.0 / (en - st))
     st = time.time()
 
     for event in pygame.event.get():
@@ -157,7 +178,7 @@ while True:
     # print(angle_x, angle_y, angle_z)
 
     g = 985.0
-    acc_x = this_read[0] + g * math.cos(angle_x) - 30
+    acc_x = this_read[0] + g * math.cos(angle_x) - 15
     acc_y = this_read[1] + g * math.cos(angle_y) - 10
     acc_z = this_read[2] + g * math.cos(angle_z) + 20
 
@@ -178,18 +199,21 @@ while True:
     p_x += dx
     p_y += dy
     p_z += dz
-    print(round(acc_x, 2), "/t", round(acc_y, 2), "\t", round(acc_z, 2))
+    print(round(acc_x, 2), "\t", round(acc_y, 2), "\t", round(acc_z, 2))
     # print(angle_x, math.cos(angle_x), angle_y, math.cos(angle_y), angle_z, math.cos(angle_z))
     # print(this_read)
     # print("--------------------------")
 
-    # print("acc: ", round(acc_x,2),round(acc_y,2),round(acc_z,2))
+    print("acc: ", round(acc_x,2),round(acc_y,2),round(acc_z,2))
     # print("vel: ", round(v_x, 2), round(v_y, 2), round(v_z, 2))
     # print("d_x: ", round(dx, 2), round(dy, 2), round(dz, 2))
     # print("pos: ", round(p_x, 2), round(p_y, 2), round(p_z, 2))
 
 
-
+    # double integration to obtain position
+    acc = (acc_x, acc_y, acc_z)  # 3D vector of acceleration
+    pos = itg.update(acc)
+    trajectory += tuple([pos])
 
     ####### Visualization #####
     count += 1
