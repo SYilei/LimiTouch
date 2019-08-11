@@ -5,12 +5,14 @@ import time
 import sys
 from pynput import keyboard
 
+
 def write_to_csv(file_path, file_list):
     csv_file = open(file_path, 'w+')
     csv_file.write('ax,ay,az,gx,gy,gz,mx,my,mz\n')
     for item in file_list:
         csv_file.write(str(item)[1:-1] + '\n')
     csv_file.close()
+
 
 def on_press(key):
     global loop
@@ -21,7 +23,7 @@ def on_press(key):
     # print(eventkey)
     # print(eventkey[0], eventkey[1], eventkey[2])
     if eventkey == 'Key.esc':
-        record = open('Data_Study1/record_'+sys.argv[1]+'.txt','w+')
+        record = open('../../data/Data_Study1/record_'+sys.argv[1]+'.txt','w+')
         for item in gestures:
             record.write(item+',')
         record.close()
@@ -32,8 +34,10 @@ def on_press(key):
             print('.........reading data........')
             read_data = True
 
+
 def on_release(key):
     pass
+
 
 def generate_gesture_order():
     gesture_order = []
@@ -61,7 +65,7 @@ gestures = []
 if len(sys.argv) == 2:
     gestures = generate_gesture_order()
 elif len(sys.argv) > 2:
-    file = open('Data_Study1/record_' + sys.argv[1]+'.txt', 'r')
+    file = open('../../data/Data_Study1/record_' + sys.argv[1]+'.txt', 'r')
     line = file.readline()
     gestures = line.split(',')[:-1]
 
@@ -92,7 +96,7 @@ while loop:
         count = count + 1
     
     if count == 30000:
-        write_to_csv('Data_Study1/'+id_user + '_' + gestures[0] + '.csv', data_list)
+        write_to_csv('../../data/Data_Study1/'+id_user + '_' + gestures[0] + '.csv', data_list)
         read_data = False
         data_list.clear()
         count = 0
