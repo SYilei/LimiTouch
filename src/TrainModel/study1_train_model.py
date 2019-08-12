@@ -31,7 +31,7 @@ class LeNet(nn.Module):
             nn.ReLU(),
         )
         self.fc = nn.Sequential(  #全连接层
-            nn.Linear(1320, 512),
+            nn.Linear(1920, 512),
             nn.ReLU(),
             nn.Linear(512, 128),
             nn.ReLU(),
@@ -117,7 +117,7 @@ batch_size = 1000
 train_num = 5000
 
 data_step = 1
-data_size = 100
+data_size = 150
 
 participants = ['chamod','hussel','kaixing','mevan','sachith','sam',\
                 'samitha','tharindu','vipula','yilei','mel','evan']
