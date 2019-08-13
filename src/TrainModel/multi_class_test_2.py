@@ -67,7 +67,7 @@ def get_test(data, step, size, touch):
     return out_put, labels
 
 ############# Start the code ###############
-model_file = '../../models/S1_step_2_size_150.txt'
+model_file = '../../models/S1_step_1_size_200.txt'
 step = int(model_file.split('_')[2])
 size = int(model_file.split('_')[4].split('.')[0])
 net = torch.load(model_file)
