@@ -4,7 +4,6 @@ import os
 import sys
 import pandas
 import random
-from pynput import keyboard
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -68,16 +67,14 @@ def get_test(data, step, size, touch):
     return out_put, labels
 
 ############# Start the code ###############
-device = torch.device('cpu')
-
-model_file = '../models/S1_step_1_size_250.txt'
+model_file = '../../models/S1_step_2_size_150.txt'
 step = int(model_file.split('_')[2])
 size = int(model_file.split('_')[4].split('.')[0])
-net = torch.load(model_file).to(device)
+net = torch.load(model_file)
 net.eval()
 
 #-------------------------------------------------------------
-data_path = '../data/Data_Study1_Difference/'
+data_path = '../../data/Data_Study1_Difference/'
 files = os.listdir(data_path)
 #files = os.listdir('..\\limitouch_independent_test_data\\')
 elbow_condition = ['elbow', 'free']
@@ -132,7 +129,7 @@ for elbow in elbow_condition:
                 #print('accuracy', round(count / len(test_label), 3), '\t', file_name)
                 print('accuracy', count / len(test_label), '\t', file_name)
 
-with open('res_user.csv', 'w', newline='') as writeFile:
+with open(model_file.split('/')[3].split('.')[0]+'.csv', 'w', newline='') as writeFile:
     writer = csv.writer(writeFile)
     writer.writerows(res_list)
 
