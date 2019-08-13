@@ -4,7 +4,6 @@ import os
 import sys
 import pandas
 import random
-from pynput import keyboard
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F

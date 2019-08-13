@@ -4,7 +4,7 @@ import os
 import sys
 import pandas
 import random
-from pynput import keyboard
+#from pynput import keyboard
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
@@ -31,7 +31,7 @@ class LeNet(nn.Module):
             nn.ReLU(),
         )
         self.fc = nn.Sequential(  #全连接层
-            nn.Linear(1920, 512),
+            nn.Linear(240, 512),
             nn.ReLU(),
             nn.Linear(512, 128),
             nn.ReLU(),
@@ -98,16 +98,16 @@ def get_batch(batch_num, t_data, nt_data, step, size):
     return out_put, labels
 
 
-def on_press(key):
-    global loop
+#def on_press(key):
+#    global loop
 
-    eventkey = '{0}'.format(key)
-    if eventkey == 'Key.esc':
-        loop = False
+ #   eventkey = '{0}'.format(key)
+  #  if eventkey == 'Key.esc':
+   #     loop = False
 
 
-def on_release(key):
-    pass
+#def on_release(key):
+#    pass
 
 
 ############# Start the code ###############
@@ -116,18 +116,18 @@ loop = True
 batch_size = 1000
 train_num = 5000
 
-data_step = 1
-data_size = 150
+data_step = 2
+data_size = 25
 
 participants = ['chamod','hussel','kaixing','mevan','sachith','sam',\
                 'samitha','tharindu','vipula','yilei','mel','evan']
 
 net = LeNet()
-optimizer = torch.optim.Adam(net.parameters(), lr=0.002)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 loss_func = torch.nn.CrossEntropyLoss()
 t_data_train, nt_data_train, t_data_test, nt_data_test = load_data()
 
-keyboard.Listener(on_press=on_press, on_release=on_release).start()
+#keyboard.Listener(on_press=on_press, on_release=on_release).start()
 
 for i in range(train_num):
     (data, label) = get_batch(batch_size, t_data_train, nt_data_train, data_step, data_size)
