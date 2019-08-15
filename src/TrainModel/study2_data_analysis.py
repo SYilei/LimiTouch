@@ -6,60 +6,59 @@ from torch.autograd import Variable
 from study1_modelclass import LeNet
 import torch.nn.functional as F
 
+def analysis_test(data, index_list, step, size, participant):
+    label = []
+    for index in index_list:
+        start = 0
+        st = int(index.split(',')[1])
+        en = int(index.split(',')[2])
+        data_clip = data[st:en]
+        while start + (size - 1) * step < len(data_clip):
+            temp_data = data_clip[start: start + size * step: step].reshape((-1, 1, 9, size))
+            temp_data = Variable(torch.FloatTensor(temp_data))
+            touch_prediction = torch.max(F.softmax(model(temp_data)), 1)[1]
+            label.append([index.split(',')[0],touch_prediction.data.numpy().squeeze()])
+            start = start + 1
+
+            if start%1000 == 0:
+                print(participant, st, ' out of ', len(data))
+    return label
+
+
+# name_num = input("Input the num of the name data you want to process:")
+# print('----Begin to prepare ' + name_list[int(name_num)] + ' data----')
+#get the data and dataindex file of participant
+
 data_path = '../../data/DataProcessed_Study2/'
+index_path = '../../data/DataProindex_Study2/'
+data_files = os.listdir(data_path)
+index_files = os.listdir(index_path)
+
 model_path = '../../models/new_step_1_size_250.txt'
-name_list = []
+step = 1
+size = 250
+
+name_list = ['_chamod','_clarence','_evan','_hussel','_jing',\
+            '_kaixing','_logan','_mevan','_sachith','_samantha'\
+            ,'_samitha','_vipula','_yilei','_yiyue']
+
 count = 0
 index = 0
-data_list = ['ax', 'ay', 'az', 'gx', 'gy', 'gz']
-data_files = os.listdir(data_path)
 model = LeNet()
 colname = ['letter','label']
 letter = []
 
-
-def analysis_test(data, step, size):
-    label = []
-    start = 0
-    while start + (size - 1) * step < (len(data) - 1):
-        temp_data = np.array(data[start: start + size * step: step]).reshape((1, -1)).tolist()
-        #print(temp_data)
-        temp_data = np.array(temp_data).reshape((-1, 1, 9, size))
-        temp_data = Variable(torch.FloatTensor(temp_data))
-        touch_prediction = torch.max(F.softmax(model(temp_data)), 1)[1]
-        label.append([letter[start],touch_prediction.data.numpy().squeeze()])
-        start = start + 5
-    return label
-
-
-#get name of participants
-for filename in data_files:
-    if filename.find('data') != -1:
-        name = filename.split('_')[-1].split('.')[0]
-        name_list.append(name)
-
-for name in name_list:
-    print(str(count) + '.' + name)
-    count += 1
-
-
-name_num = input("Input the num of the name data you want to process:")
-print('----Begin to prepare ' + name_list[int(name_num)] + ' data----')
-#get the data and dataindex file of participant
-for filename in data_files:
-    if filename.find(name_list[int(name_num)]) != -1:
-        data_csv = pd.read_csv(data_path + filename)
-        temp = data_csv[['ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz']].values
-        letter = data_csv[['letter']].values
-
-print(letter)
-
 model.load_state_dict(torch.load(model_path))
 model.eval()
-print('----Model load succesfully----')
+for participant in name_list:
+    for filename in data_files:
+        if participant in filename and participant == '_clarence':
+            data_csv = pd.read_csv(data_path + filename)
+            data_np = data_csv[['ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz']].values
+            for index in index_files:
+                if participant in index and participant == '_clarence':
+                    index_list = open(index_path + index).readlines()
+                    print('Processing: ' + participant)
+                    touch_result = analysis_test(data_np, index_list[1:], step, size, participant)
+                    pd.DataFrame(touch_result).to_csv('../../data/DataLabels_Study2/'+participant+'.csv')
 
-touch_result = analysis_test(temp, 1, 250)
-
-print('----Begin to save result as csv----')
-result_csv = pd.DataFrame(columns=colname, data=touch_result)
-result_csv.to_csv('data_touchlabel_' + name_list[int(name_num)] + '.csv', index=False)
