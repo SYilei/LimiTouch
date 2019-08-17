@@ -31,7 +31,7 @@ class LeNet(nn.Module):
             nn.ReLU(),
         )
         self.fc = nn.Sequential(  #全连接层
-            nn.Linear(240, 512),
+            nn.Linear(3240, 512),
             nn.ReLU(),
             nn.Linear(512, 128),
             nn.ReLU(),
@@ -55,13 +55,13 @@ def load_data():
     nt_data_test = []
     count = 0
     for file_name in files:
-        if '_touch' in file_name and file_name.split('_')[0] in participants[:-2]:
+        if '_touch' in file_name and file_name.split('_')[0] in participants[:-2] and 'static' in file_name:
             data_np = pandas.read_csv('../../data/Data_Study1_Difference/'+file_name).values
             t_data_train.append(data_np[:4 * len(data_np) // 5])
             t_data_test.append(data_np[4 * len(data_np) // 5:])
             print(count, 'Read: ' + file_name)
             count += 1
-        elif '_nontouch' in file_name and file_name.split('_')[0] in participants[:-2]:
+        elif '_nontouch' in file_name and file_name.split('_')[0] in participants[:-2] and 'static' in file_name:
             data_np = pandas.read_csv('../../data/Data_Study1_Difference/' + file_name).values
             nt_data_train.append(data_np[:4 * len(data_np) // 5])
             nt_data_test.append(data_np[4 * len(data_np) // 5:])
