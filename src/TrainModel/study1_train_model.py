@@ -31,7 +31,7 @@ class LeNet(nn.Module):
             nn.ReLU(),
         )
         self.fc = nn.Sequential(  #全连接层
-            nn.Linear(240, 512),
+            nn.Linear(3240, 512),
             nn.ReLU(),
             nn.Linear(512, 128),
             nn.ReLU(),
