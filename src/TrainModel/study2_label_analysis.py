@@ -35,7 +35,7 @@ def find_period(data):
 				if zero > 100:
 					if one > 400:
 						count += 1
-						gest_st_en.append([st+250,en])
+						gest_st_en.append([st, i, en])
 					one = 0
 					zero = 0
 					zero_one = 0
@@ -49,7 +49,7 @@ def find_period(data):
 	# print(one)
 	# print(zero_flag)
 	if zero_flag and one > 400:
-		gest_st_en.append([st+250,en])
+		gest_st_en.append([st, en, en])
 		count += 1
 	return count, gest_st_en
 
@@ -69,8 +69,8 @@ line1, = axes.plot([], [], color = 'green')
 line2, = axes.plot([], [], color = 'red')
 line3, = axes.plot([], [], color = 'blue')
 
-ymin = -50
-ymax = 50
+ymin = -100
+ymax = 100
 check_plot = True
 print('-------------------------')
 for name in name_list:
@@ -85,54 +85,57 @@ for name in name_list:
 					# (correct, fail_list, more_list) = process(label_list, data_info,name,original_index,original_data)
 					fail_list = []
 					more_list = []
+					good_list = []
 					correct = 0
 					for line in data_info:
 						letter = line.split(',')[1]
 						st = int(line.split(',')[2])
 						en = int(line.split(',')[3])
 						data = label_list[st : en]
-						gest_num, gest_st = find_period(data)
+						gest_num, gest_st_en = find_period(data)
 						final_gest_num = 0
-						final_gest_st = []
+						final_gest_st_en = []
 
 						if gest_num > 1:
-							original_dataclip = (np.array(gest_st) + original_index[st]).tolist()
+							original_dataclip = (np.array(gest_st_en) + original_index[st]).tolist()
 							for i in range(len(original_dataclip)):
 								t = (original_data[original_dataclip[i][0]:original_dataclip[i][1]]**2).sum(1)
 								t.sort()
 								sm = t[:int(0.8*len(t))].mean()
 								if sm > 10:
 									final_gest_num += 1
-									final_gest_st.append(gest_st[i])
-						else:
+									final_gest_st_en.append([gest_st_en[i][0]+250,gest_st_en[i][2]])
+						elif gest_num == 1:
 							final_gest_num = gest_num
-							final_gest_st = gest_st
+							final_gest_st_en.append([gest_st_en[0][0]+250,gest_st_en[0][2]])
 						
 
 						if final_gest_num == 0:
-							fail_list.append([letter, st, gest_num])
+							fail_list.append([letter, st, final_gest_num])
 							# for i in range(len(data)):
 							# 	print(i+st, letter, data[i], name, st, 'label file index: ', i + st, 'original file index: ', i + original_index[st])
 							if check_plot:
 								print(len(fail_list)+len(more_list)+correct, letter, 'no gesture found')
 						
 						elif final_gest_num > 1:
-							more_list.append([letter, st, gest_num])
-							original_dataclip = (np.array(final_gest_st) + original_index[st]).tolist()
+							more_list.append([letter, st, final_gest_num])
+							original_dataclip = (np.array(final_gest_st_en) + original_index[st]).tolist()
 							# for i in range(len(data)):
 							# 	print(i+st, letter, data[i], name, st, 'label file: ',(np.array(gest_st) + st).tolist(), 'original file: ', original_dataclip)
 							if check_plot:
 								for i in range(len(original_dataclip)):
-									plt.scatter(original_dataclip[i], [-40+i*10, -40+i*10])
+									plt.scatter(original_dataclip[i], [-80+i*10, -80+i*10])
 								# print(letter, original_dataclip)
 								print(len(fail_list)+len(more_list)+correct, letter, 'more gesture found')
 						
 						elif final_gest_num == 1:
 							correct += 1
+							temp_index = np.array(gest_st_en) + original_index[st]
+							good_list.append([letter, temp_index[0][0], temp_index[0][1]])
 							if check_plot:
-								original_dataclip = (np.array(final_gest_st) + original_index[st]).tolist()
+								original_dataclip = (np.array(final_gest_st_en) + original_index[st]).tolist()
 								for i in range(len(original_dataclip)):
-									plt.scatter(original_dataclip[i], [-40+i*10, -40+i*10])
+									plt.scatter(original_dataclip[i], [-80+i*10, -80+i*10])
 								print(len(fail_list)+len(more_list)+correct, letter, 'good gesture found')
 						
 
@@ -153,4 +156,29 @@ for name in name_list:
 							plt.pause(1e-17)
 							input('next')
 					print(name+'   \t', 'correct number',correct, '- the one that fail: ',len(fail_list), '- the one that more: ',len(more_list))
+					pd.DataFrame(good_list).to_csv('../../data/DataLabels_Study2/gest_pos_index'+'_'+name+'.csv', index=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
