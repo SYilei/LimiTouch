@@ -4,71 +4,29 @@ import os
 import sys
 import pandas
 import random
-#from pynput import keyboard
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
-
-
-
-#################################################################################################################
-###### This file was to tain a specific model to differentiate touch static and nontouch static, now it's useless
-#################################################################################################################
-
-
-################## Classes #################
-class LeNet(nn.Module):
-    def __init__(self):
-        super(LeNet, self).__init__()  # 调用基类的__init__()函数
-        '''torch.nn.Conv2d(in_channels, out_channels, kernel_size,
-            stride=1, padding=0, dilation=1, groups=1, bias=True)'''
-
-        '''torch.nn.MaxPool2d(kernel_size, stride=None, 
-            padding=0, dilation=1, return_indices=False, ceil_mode=False)
-            stride – the stride of the window. Default value is kernel_size'''
-        self.conv = nn.Sequential(
-            nn.Conv2d(1, 16, 9, stride=1, padding=4),  # 卷积层 输入1通道，输出6通道，kernel_size=5*5
-            nn.ReLU(),  # 激活函数
-            nn.MaxPool2d(3, 3),
-            nn.Conv2d(16, 32, 5, stride=1, padding=2),  # 卷积层 输入6通道，输出16通道，kernel_size=5*5
-            nn.ReLU(),
-            nn.MaxPool2d(3, 3),
-            nn.Conv2d(32, 120, 5, stride=1, padding=2),  # 卷积层 输入16通道，输出120通道，kernel_size=5*5
-            nn.ReLU(),
-        )
-        self.fc = nn.Sequential(  #全连接层
-            nn.Linear(3240, 512),
-            nn.ReLU(),
-            nn.Linear(512, 128),
-            nn.ReLU(),
-            nn.Linear(128, 2),
-            nn.Softmax(),
-        )
-
-    def forward(self, x):  # 前向传播
-        out = self.conv(x)
-        out = out.view(out.size(0), -1)
-        out = self.fc(out)
-        return out
-
+from study1_modelclass import LeNet
 
 def load_data():
     global participants
-    files = os.listdir('../../data/Data_Study1_Difference/')
+    path = '../../data/Study3_derivative/'
+    files = os.listdir(path)
     t_data_train = []
     t_data_test = []
     nt_data_train = []
     nt_data_test = []
     count = 0
     for file_name in files:
-        if '_touch' in file_name and file_name.split('_')[0] in participants[:-2] and 'static' in file_name:
-            data_np = pandas.read_csv('../../data/Data_Study1_Difference/'+file_name).values
+        if '_touch' in file_name and file_name.split('_')[0] in participants[:]:
+            data_np = pandas.read_csv(path + file_name).values
             t_data_train.append(data_np[:4 * len(data_np) // 5])
             t_data_test.append(data_np[4 * len(data_np) // 5:])
             print(count, 'Read: ' + file_name)
             count += 1
-        elif '_nontouch' in file_name and file_name.split('_')[0] in participants[:-2] and 'static' in file_name:
-            data_np = pandas.read_csv('../../data/Data_Study1_Difference/' + file_name).values
+        elif '_nontouch' in file_name and file_name.split('_')[0] in participants[:]:
+            data_np = pandas.read_csv(path + file_name).values
             nt_data_train.append(data_np[:4 * len(data_np) // 5])
             nt_data_test.append(data_np[4 * len(data_np) // 5:])
             print(count, 'Read: ' + file_name)
@@ -103,20 +61,8 @@ def get_batch(batch_num, t_data, nt_data, step, size):
     labels = Variable(torch.LongTensor(labels))
     return out_put, labels
 
-
-#def on_press(key):
-#    global loop
-
- #   eventkey = '{0}'.format(key)
-  #  if eventkey == 'Key.esc':
-   #     loop = False
-
-
-#def on_release(key):
-#    pass
-
-
 ############# Start the code ###############
+
 loop = True
 batch_size = 1000
 train_num = 5000
@@ -124,11 +70,11 @@ train_num = 5000
 data_step = 1
 data_size = 250
 
-participants = ['chamod','hussel','kaixing','mevan','sachith','sam',\
-                'samitha','tharindu','vipula','yilei','mel','evan']
+participants = ['hussel','jing','mevan','sachith','logan',\
+                'samitha','tharindu','vipula','yilei','evan']
 
 net = LeNet()
-optimizer = torch.optim.Adam(net.parameters(), lr=0.002)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 loss_func = torch.nn.CrossEntropyLoss()
 t_data_train, nt_data_train, t_data_test, nt_data_test = load_data()
 
@@ -158,7 +104,7 @@ for i in range(train_num):
     if not loop:
         break
 
-torch.save(net, '../../models/S1_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
+torch.save(net, '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
 
 

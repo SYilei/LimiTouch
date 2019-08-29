@@ -53,6 +53,26 @@ def find_period(data):
 		count += 1
 	return count, gest_st_en
 
+def remove_flat(data, index):
+	data_clip = data[index[0][0]: index[0][1]]
+	
+	tail = data_clip[-200:-40]
+	value = np.sqrt(tail*tail).mean(0)
+	length = 0
+	if value[0] < 1.5 and value[1] < 1.5 and value[2] < 1.5:
+		length = 200
+		while value[0] < 1.5 and value[1] < 1.5 and value[2] < 1.5:
+			length += 10
+			tail = data_clip[-length:-length+10]
+			value = np.sqrt(tail*tail).mean(0)
+		# print('oooooooooooooooooooo')
+		# length = 200
+		# while np.sqrt(data_clip[-length+10:-length] * data_clip[-length+10:-length]).mean() < 8:
+		# 	length = length + 10
+	# else:
+	# 	print('xxxxxxxxxxxxxxxxxxx')
+	return [[index[0][0], index[0][1] - length]]
+
 
 files = os.listdir('../../data/DataLabels_Study2/')
 name_list = ['_chamod','_clarence','_evan','_hussel','_jing',\
@@ -130,12 +150,12 @@ for name in name_list:
 						
 						elif final_gest_num == 1:
 							correct += 1
-							temp_index = np.array(gest_st_en) + original_index[st]
-							good_list.append([letter, temp_index[0][0], temp_index[0][1]])
+							haha = remove_flat(original_data, np.array(final_gest_st_en) + original_index[st])
+							temp_index = np.array(final_gest_st_en) + original_index[st]
+							good_list.append([letter, haha[0][0], haha[0][1]])
 							if check_plot:
-								original_dataclip = (np.array(final_gest_st_en) + original_index[st]).tolist()
-								for i in range(len(original_dataclip)):
-									plt.scatter(original_dataclip[i], [-80+i*10, -80+i*10])
+								plt.scatter(temp_index[0], [-80, -80], color = 'red')
+								plt.scatter(haha[0], [-70, -70], color = 'green')
 								print(len(fail_list)+len(more_list)+correct, letter, 'good gesture found')
 						
 
