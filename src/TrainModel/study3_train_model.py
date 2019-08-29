@@ -104,7 +104,7 @@ for i in range(train_num):
     if not loop:
         break
 
-torch.save(net, '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
+torch.save(net.state_dict(), '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
 
 
