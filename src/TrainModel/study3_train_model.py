@@ -85,7 +85,8 @@ for participant in participants:
         # print(data)
         prediction = net(data)
         loss = loss_func(prediction, label)
-        print(i, loss)
+        if i%5 == 0:
+            print(i, loss)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
