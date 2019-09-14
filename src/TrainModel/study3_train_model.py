@@ -70,11 +70,11 @@ train_num = 4000
 data_step = 1
 data_size = 250
 
-participants = ['hussel','jing','mevan','sachith','logan','samitha','tharindu','vipula','yilei','evan','pai','chamod']
+participants = ['yilei','evan','pai','chamod']
 
 for participant in participants:
     net = LeNet()
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.0003)
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.0002)
     loss_func = torch.nn.CrossEntropyLoss()
     t_data_train, nt_data_train, t_data_test, nt_data_test = load_data(participant)
 
