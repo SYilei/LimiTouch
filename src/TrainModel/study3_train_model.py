@@ -73,8 +73,10 @@ data_size = 250
 participants = ['hussel','jing','mevan','sachith','logan',\
                 'samitha','tharindu','vipula','yilei','evan']
 
+participants = ['yilei']
+
 net = LeNet()
-optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.0005)
 loss_func = torch.nn.CrossEntropyLoss()
 t_data_train, nt_data_train, t_data_test, nt_data_test = load_data()
 
@@ -104,8 +106,9 @@ for i in range(train_num):
     if not loop:
         break
 
-torch.save(net.state_dict(), '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
+# torch.save(net.state_dict(), '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
+torch.save(net.state_dict(), '../../models/Study3/S3_individual_'+participants[0]+'_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
 
 
