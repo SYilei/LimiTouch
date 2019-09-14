@@ -70,7 +70,7 @@ train_num = 4000
 data_step = 1
 data_size = 250
 
-participants = ['yilei','evan','pai','chamod']
+participants = ['_evan','_pai','_chamod']
 
 for participant in participants:
     net = LeNet()
