@@ -19,13 +19,13 @@ def load_data(participant):
     nt_data_test = []
     count = 0
     for file_name in files:
-        if '_touch' in file_name and participant in file_name:
+        if '_touch' in file_name and participant in file_name and not('mevan' in file_name):
             data_np = pandas.read_csv(path + file_name).values
             t_data_train.append(data_np[:4 * len(data_np) // 5])
             t_data_test.append(data_np[4 * len(data_np) // 5:])
             print(count, 'Read: ' + file_name)
             count += 1
-        elif '_nontouch' in file_name and participant in file_name:
+        elif '_nontouch' in file_name and participant in file_name  and not('mevan' in file_name):
             data_np = pandas.read_csv(path + file_name).values
             nt_data_train.append(data_np[:4 * len(data_np) // 5])
             nt_data_test.append(data_np[4 * len(data_np) // 5:])
@@ -70,7 +70,7 @@ train_num = 4000
 data_step = 1
 data_size = 250
 
-participants = ['_evan','_pai','_chamod']
+participants = ['evan','pai','chamod']
 
 for participant in participants:
     net = LeNet()
