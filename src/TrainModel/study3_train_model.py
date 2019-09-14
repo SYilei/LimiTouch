@@ -9,7 +9,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 from study1_modelclass import LeNet
 
-def load_data():
+def load_data(participant):
     global participants
     path = '../../data/Study3_derivative/'
     files = os.listdir(path)
@@ -19,13 +19,13 @@ def load_data():
     nt_data_test = []
     count = 0
     for file_name in files:
-        if '_touch' in file_name and file_name.split('_')[0] in participants[:]:
+        if '_touch' in file_name and participant in file_name:
             data_np = pandas.read_csv(path + file_name).values
             t_data_train.append(data_np[:4 * len(data_np) // 5])
             t_data_test.append(data_np[4 * len(data_np) // 5:])
             print(count, 'Read: ' + file_name)
             count += 1
-        elif '_nontouch' in file_name and file_name.split('_')[0] in participants[:]:
+        elif '_nontouch' in file_name and participant in file_name:
             data_np = pandas.read_csv(path + file_name).values
             nt_data_train.append(data_np[:4 * len(data_np) // 5])
             nt_data_test.append(data_np[4 * len(data_np) // 5:])
@@ -65,50 +65,49 @@ def get_batch(batch_num, t_data, nt_data, step, size):
 
 loop = True
 batch_size = 1000
-train_num = 5000
+train_num = 4000
 
 data_step = 1
 data_size = 250
 
-participants = ['hussel','jing','mevan','sachith','logan',\
-                'samitha','tharindu','vipula','yilei','evan']
+participants = ['hussel','jing','mevan','sachith','logan','samitha','tharindu','vipula','yilei','evan','pai','chamod']
 
-participants = ['yilei']
 
-net = LeNet()
-optimizer = torch.optim.Adam(net.parameters(), lr=0.0005)
-loss_func = torch.nn.CrossEntropyLoss()
-t_data_train, nt_data_train, t_data_test, nt_data_test = load_data()
+for participant in participants:
+    net = LeNet()
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.0003)
+    loss_func = torch.nn.CrossEntropyLoss()
+    t_data_train, nt_data_train, t_data_test, nt_data_test = load_data(participant)
 
-#keyboard.Listener(on_press=on_press, on_release=on_release).start()
+    #keyboard.Listener(on_press=on_press, on_release=on_release).start()
 
-for i in range(train_num):
-    (data, label) = get_batch(batch_size, t_data_train, nt_data_train, data_step, data_size)
-    # print(data)
-    prediction = net(data)
-    loss = loss_func(prediction, label)
-    print(i, loss)
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+    for i in range(train_num):
+        (data, label) = get_batch(batch_size, t_data_train, nt_data_train, data_step, data_size)
+        # print(data)
+        prediction = net(data)
+        loss = loss_func(prediction, label)
+        print(i, loss)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-    ##test
-    if i%5==0:
-        (test_data, test_label) = get_batch(batch_size, t_data_test, nt_data_test, data_step, data_size)
-        prediction = torch.max(F.softmax(net(test_data)), 1)[1]
-        y_pred = prediction.data.numpy().squeeze()
-        count = 0
-        for i in range(len(y_pred)):
-            if y_pred[i] == test_label[i]:
-                count += 1
-        print(count / 1000)
+        ##test
+        if i%5==0:
+            (test_data, test_label) = get_batch(batch_size, t_data_test, nt_data_test, data_step, data_size)
+            prediction = torch.max(F.softmax(net(test_data)), 1)[1]
+            y_pred = prediction.data.numpy().squeeze()
+            count = 0
+            for i in range(len(y_pred)):
+                if y_pred[i] == test_label[i]:
+                    count += 1
+            print(count / 1000)
 
-    if not loop:
-        break
+        if not loop:
+            break
 
-# torch.save(net.state_dict(), '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
+    # torch.save(net.state_dict(), '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
-torch.save(net.state_dict(), '../../models/Study3/S3_individual_'+participants[0]+'_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
+    torch.save(net.state_dict(), '../../models/Study3/S3_individual_'+participant+'_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
 
 
