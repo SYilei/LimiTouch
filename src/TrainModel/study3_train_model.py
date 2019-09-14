@@ -72,7 +72,6 @@ data_size = 250
 
 participants = ['hussel','jing','mevan','sachith','logan','samitha','tharindu','vipula','yilei','evan','pai','chamod']
 
-
 for participant in participants:
     net = LeNet()
     optimizer = torch.optim.Adam(net.parameters(), lr=0.0003)
