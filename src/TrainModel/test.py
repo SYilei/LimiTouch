@@ -1,7 +1,5 @@
-import matplotlib.pyplot as plt
 import os
 import pandas as pd
-import numpy.fft
 
 path = '../../data/Study3_raw_data/'
 
