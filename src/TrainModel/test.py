@@ -1,32 +1,22 @@
-from numpy import sin, linspace, pi
-from pylab import plot, show, title, xlabel, ylabel, subplot
-from scipy import fft, arange
+import matplotlib.pyplot as plt
+import os
+import pandas as pd
+import numpy.fft
 
-def plotSpectrum(y,Fs):
-	n = len(y) # length of the signal
-	k = arange(n)
-	T = n/Fs
-	frq = k/T # two sides frequency range
-	frq = frq[range(n/2)] # one side frequency range
+path = '../../data/Study5_force_derivative/'
+names = ['chamod','clarence','haimo','hussel','jiashuo','logan','sachith','samitha','shamane','tharindu','vipula','yilei']
+numbers = ['1','2','3','4','5','6']
+files = os.listdir(path)
 
-	Y = fft(y)/n # fft computing and normalization
-	Y = Y[range(n/2)]
+for name in names:
+	for number in numbers:
+		print(path+name+'_high_force'+number+'.csv', path+name+'_low_force'+number+'.csv')
+		data1 = pd.read_csv(path+name+'_high_force'+number+'.csv').values
+		data2 = pd.read_csv(path+name+'_low_force'+number+'.csv').values
+		fft1 = numpy.fft.fft(data1[:,0])
+		fft2 = numpy.fft.fft(data2[:,0])
 
-	plot(frq,abs(Y),'r') # plotting the spectrum
-	xlabel('Freq (Hz)')
-	ylabel('|Y(freq)|')
-
-Fs = 150.0;  # sampling rate
-Ts = 1.0/Fs; # sampling interval
-t = arange(0,1,Ts) # time vector
-
-ff = 5;   # frequency of the signal
-y = sin(2*pi*ff*t)
-
-subplot(2,1,1)
-plot(t,y)
-xlabel('Time')
-ylabel('Amplitude')
-subplot(2,1,2)
-plotSpectrum(y,Fs)
-show()
+		plt.plot(fft1, label='high')
+		plt.plot(fft2, label='low')
+		plt.ylabel('some numbers')
+		plt.show()

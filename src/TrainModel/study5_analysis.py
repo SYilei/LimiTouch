@@ -5,14 +5,28 @@ import pandas as pd
 import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
-device = torch.device('cpu')
-model = LeNet()
-try:
-    model.load_state_dict(torch.load('../../models/new_step_1_size_250.txt', map_location=device))
-    print('load model successfully!')
-except Exception as e:
-    print('there is something wrong!')
-    raise e
+
+
+
+
+loop = True
+batch_size = 1000
+train_num = 3000
+
+data_step = 1
+data_size = 250
+
+participants = ['chamod','clarence','haimo','hussel','jiashuo','logan','sachith','samitha','shamane','tharindu','vipula','yilei']
+
+for participant in participants:
+    device = torch.device('cpu')
+    model = LeNet()
+    try:
+        model.load_state_dict(torch.load('../../models/new_step_1_size_250.txt', map_location=device))
+        print('load model successfully!')
+    except Exception as e:
+        print('there is something wrong!')
+        raise e
 
 
 # path = '../../data/Study1_derivative/'
