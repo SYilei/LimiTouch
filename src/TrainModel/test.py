@@ -11,4 +11,4 @@ for file in files:
 		data['mx'] = data['ax']
 		data['my'] = data['ay']
 		data['mz'] = data['az']
-		data.to_csv(path+file)
+		data.to_csv(path+file, index=False)
