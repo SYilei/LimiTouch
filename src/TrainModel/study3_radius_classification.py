@@ -90,7 +90,7 @@ data_step = 1
 data_size = 250
 
 gestures = ['cabinet','door_handle','door.csv','large_bottle','small_bottle','microwave']
-participants = ['chamod_','evan_','hussel_','jing_','logan_','maven_','pai_','sachith_','samitha_','tharindu_','vipula_','yilei_']
+participants = ['vipula_','yilei_']
 
 
 for participant in participants:
@@ -127,7 +127,7 @@ for participant in participants:
 
     # torch.save(net.state_dict(), '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
-    torch.save(net.state_dict(), '../../models/Study3/gesture_'+participant+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
+    torch.save(net.state_dict(), '../../models/Study3/gesture_overall_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
 
 
