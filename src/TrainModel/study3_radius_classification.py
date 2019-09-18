@@ -42,7 +42,7 @@ class LeNet(nn.Module):
         out = self.fc(out)
         return out
 
-def load_data(participant):
+def load_data():
     path = '../../data/Study3_derivative/'
     files = os.listdir(path)
     data_train = [[],[],[],[],[],[]]
@@ -52,7 +52,7 @@ def load_data(participant):
     count = 0
     for gesture in gestures.keys():
         for file_name in files:
-            if '_touch' in file_name and gesture in file_name and participant in file_name:
+            if '_touch' in file_name and gesture in file_name:
                 data_np = pandas.read_csv(path + file_name).values
                 data_np = (data_np - data_np.mean(0)) / data_np.std(0)
                 data_train[gestures[gesture]].append(data_np[:4 * len(data_np) // 5])
@@ -90,44 +90,42 @@ data_step = 1
 data_size = 250
 
 gestures = ['cabinet','door_handle','door.csv','large_bottle','small_bottle','microwave']
-participants = ['vipula_','yilei_']
+# participants = ['vipula_','yilei_']
 
+net = LeNet()
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+loss_func = torch.nn.CrossEntropyLoss()
+data_train, data_test = load_data()
 
-for participant in participants:
-    net = LeNet()
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
-    loss_func = torch.nn.CrossEntropyLoss()
-    data_train, data_test = load_data(participant)
+#keyboard.Listener(on_press=on_press, on_release=on_release).start()
 
-    #keyboard.Listener(on_press=on_press, on_release=on_release).start()
+for i in range(train_num):
+    (data, label) = get_batch(batch_size, data_train, data_step, data_size)
+    prediction = net(data)
+    loss = loss_func(prediction, label)
+    if i%5 == 0:
+        print(i, loss)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
 
-    for i in range(train_num):
-        (data, label) = get_batch(batch_size, data_train, data_step, data_size)
-        prediction = net(data)
-        loss = loss_func(prediction, label)
-        if i%5 == 0:
-            print(i, loss)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    ##test
+    if i%5==0:
+        (test_data, test_label) = get_batch(batch_size, data_test, data_step, data_size)
+        prediction = torch.max(F.softmax(net(test_data)), 1)[1]
+        y_pred = prediction.data.numpy().squeeze()
+        count = 0
+        for i in range(len(y_pred)):
+            if y_pred[i] == test_label[i]:
+                count += 1
+        print(count / len(y_pred))
 
-        ##test
-        if i%5==0:
-            (test_data, test_label) = get_batch(batch_size, data_test, data_step, data_size)
-            prediction = torch.max(F.softmax(net(test_data)), 1)[1]
-            y_pred = prediction.data.numpy().squeeze()
-            count = 0
-            for i in range(len(y_pred)):
-                if y_pred[i] == test_label[i]:
-                    count += 1
-            print(count / len(y_pred))
-
-        if not loop:
-            break
+    if not loop:
+        break
 
     # torch.save(net.state_dict(), '../../models/Study3/S3_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
-    torch.save(net.state_dict(), '../../models/Study3/gesture_overall_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
+torch.save(net.state_dict(), '../../models/Study3/gesture_overall_'+'step_'+str(data_step)+'_size_'+str(data_size)+'.txt')
 
 
 
