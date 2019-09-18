@@ -52,8 +52,9 @@ def load_data():
     count = 0
     for gesture in gestures.keys():
         for file_name in files:
-            if '_touch' in file_name and gesture in file_name:
+            if '_touch' in file_name and gesture in file_name and 'hussel_' in file_name:
                 data_np = pandas.read_csv(path + file_name).values
+                data_np = (data_np - data_np.mean(0)) / data_np.std(0)
                 data_train[gestures[gesture]].append(data_np[:4 * len(data_np) // 5])
                 data_test[gestures[gesture]].append(data_np[4 * len(data_np) // 5:])
                 print(count, 'Read: ' + file_name)
@@ -83,7 +84,7 @@ def get_batch(batch_num, data, step, size):
 
 loop = True
 batch_size = 200
-train_num = 2000
+train_num = 4000
 
 data_step = 1
 data_size = 250
@@ -92,7 +93,7 @@ gestures = ['cabinet','door_handle','door.csv','large_bottle','small_bottle','mi
 
 
 net = LeNet()
-optimizer = torch.optim.Adam(net.parameters(), lr=0.0002)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 loss_func = torch.nn.CrossEntropyLoss()
 data_train, data_test = load_data()
 

@@ -117,16 +117,16 @@ data_path = '../../data/Study5_force_derivative/'
 
 loop = True
 batch_size = 1000
-train_num = 3000
+train_num = 1000
 
 data_step = 1
 data_size = 250
 
-participants = ['chamod','clarence','haimo','hussel','jiashuo','logan','sachith','samitha','shamane','tharindu','vipula','yilei']
+participants = ['haimo','yilei']
 
 for participant in participants:
     net = LeNet()
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.002)
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.0002)
     loss_func = torch.nn.CrossEntropyLoss()
     t_data_train, nt_data_train, t_data_test, nt_data_test = load_data(participant)
 
